@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://3x5iyc3i3nwj"]
+
+[ext_resource type="Script" path="res://player/player.gd" id="1_b0fta"]
+[ext_resource type="Texture2D" uid="uid://q5a71p304udr" path="res://assets/player_ship.png" id="1_fcbt1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_30bk5"]
+radius = 30.0167
+
+[node name="Player" type="RigidBody2D"]
+linear_damp = 0.5
+angular_damp = 5.0
+script = ExtResource("1_b0fta")
+engine_power = 15000
+spin_power = 15000
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+rotation = 1.5708
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_fcbt1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_30bk5")
