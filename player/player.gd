@@ -17,6 +17,7 @@ var state = null
 # movement variables
 @export var engine_power: int
 @export var spin_power: int
+var max_speed: Vector2 = Vector2(5000, 0)
 
 # bullet variables
 @export var Bullet: PackedScene
@@ -68,6 +69,7 @@ func get_input():
 	if Input.is_action_pressed("shoot") and can_shoot:
 		shoot_bullet()
 		
+	linear_velocity.clamp(Vector2.ZERO, max_speed)
 		
 func shoot_bullet():
 	if state == INVULNERABLE:

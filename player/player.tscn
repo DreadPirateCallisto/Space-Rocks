@@ -1,13 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://3x5iyc3i3nwj"]
+[gd_scene load_steps=6 format=3 uid="uid://3x5iyc3i3nwj"]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_b0fta"]
 [ext_resource type="Texture2D" uid="uid://q5a71p304udr" path="res://assets/player_ship.png" id="1_fcbt1"]
 [ext_resource type="PackedScene" uid="uid://cbg7v725fkukq" path="res://player/bullet.tscn" id="2_hbtvb"]
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_jgivo"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_30bk5"]
 radius = 30.0167
 
 [node name="Player" type="RigidBody2D"]
+physics_material_override = SubResource("PhysicsMaterial_jgivo")
 linear_damp = 1.0
 angular_damp = 5.0
 script = ExtResource("1_b0fta")
