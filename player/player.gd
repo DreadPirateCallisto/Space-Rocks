@@ -1,5 +1,7 @@
 extends RigidBody2D
 
+signal shoot
+
 var screensize = Vector2()
 
 # enum is short for enumeration, is a short convenient way to create a set of constants
@@ -12,8 +14,15 @@ var screensize = Vector2()
 enum {INIT, ALIVE, INVULNERABLE, DEAD}
 var state = null
 
+# movement variables
 @export var engine_power: int
 @export var spin_power: int
+
+# bullet variables
+@export var Bullet: PackedScene
+@export var fire_rate: float
+
+var can_shoot = true
 
 # thrust will represent the force being applied by the ship's engine
 # either (0, 0) when coasting, or a vector with the length of engine_power when powered on.
@@ -24,6 +33,7 @@ var rotation_dir = 0
 
 func _ready():
 	screensize = get_viewport().get_visible_rect().size
+	$GunTimer.wait_time = fire_rate
 	change_state(ALIVE)
 	
 func change_state(new_state):
@@ -46,21 +56,27 @@ func get_input():
 	thrust = Vector2()
 	if state in [DEAD, INIT]:
 		return
-	if Input.is_action_just_pressed("thrust"):
+	if Input.is_action_pressed("thrust"):
 		thrust = Vector2(engine_power, 0)
 	rotation_dir = 0
 	if Input.is_action_pressed("rotate_right"):
 		rotation_dir += 1
 	if Input.is_action_pressed("rotate_left"):
 		rotation_dir -= 1
-		
-#func _physics_process(_delta):
-	#apply_force(thrust.rotated(rotation))
-	#apply_torque(spin_power * rotation_dir)
 	
-# This allows us to read and safely modify the siulation state for the object
-# Use this instead of  _phyiscs_process if you need to directly change the body's
-# position or other physics properties.
+	# shooting
+	if Input.is_action_pressed("shoot") and can_shoot:
+		shoot_bullet()
+		
+		
+func shoot_bullet():
+	if state == INVULNERABLE:
+		return
+	emit_signal("shoot", Bullet, $Muzzle.global_position, rotation)
+	can_shoot = false
+	$GunTimer.start()
+
+
 """
 	A transform matrix represents one or more transformations in 2D space such
 	as translation, rotation, and/or scaling. Translation (position) information
@@ -91,4 +107,5 @@ func _integrate_forces(physics_state):
 	physics_state.transform = new_transform
 	
 
-
+func _on_gun_timer_timeout():
+	can_shoot = true

@@ -1,17 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://3x5iyc3i3nwj"]
+[gd_scene load_steps=5 format=3 uid="uid://3x5iyc3i3nwj"]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_b0fta"]
 [ext_resource type="Texture2D" uid="uid://q5a71p304udr" path="res://assets/player_ship.png" id="1_fcbt1"]
+[ext_resource type="PackedScene" uid="uid://cbg7v725fkukq" path="res://player/bullet.tscn" id="2_hbtvb"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_30bk5"]
 radius = 30.0167
 
 [node name="Player" type="RigidBody2D"]
-linear_damp = 0.5
+linear_damp = 1.0
 angular_damp = 5.0
 script = ExtResource("1_b0fta")
-engine_power = 15000
+engine_power = 2500
 spin_power = 15000
+Bullet = ExtResource("2_hbtvb")
+fire_rate = 0.25
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 rotation = 1.5708
@@ -20,3 +23,12 @@ texture = ExtResource("1_fcbt1")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_30bk5")
+
+[node name="Muzzle" type="Marker2D" parent="."]
+position = Vector2(34, 0)
+
+[node name="GunTimer" type="Timer" parent="."]
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="GunTimer" to="." method="_on_gun_timer_timeout"]
