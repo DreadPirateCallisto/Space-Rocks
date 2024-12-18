@@ -19,6 +19,18 @@ func _process(_delta):
 	if playing and $Rocks.get_child_count() == 0:
 		new_level()
 
+func _input(event):
+	if event.is_action_pressed("pause"):
+		if not playing:
+			return
+		get_tree().paused = not get_tree().paused
+		if get_tree().paused:
+			$HUD/MessageLabel.text = "Paused"
+			$HUD/MessageLabel.show()
+		else:
+			$HUD/MessageLabel.text = ""
+			$HUD/MessageLabel.hide()
+
 """
 	when called with a size parameter, it picks a random position alogn the Rockpath
 	and a random velocity. If those values are also provided, it will use them

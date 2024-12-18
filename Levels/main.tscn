@@ -13,6 +13,7 @@ _data = {
 point_count = 10
 
 [node name="Main" type="Node2D"]
+process_mode = 3
 script = ExtResource("1_d3iwd")
 Rock = ExtResource("2_f68rb")
 
