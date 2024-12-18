@@ -1,6 +1,8 @@
 extends RigidBody2D
 
 signal shoot
+signal lives_changed
+signal dead
 
 var screensize = Vector2()
 
@@ -32,21 +34,43 @@ var thrust = Vector2()
 # represents what direction the ship is turning in and applies a torque or rotational force.
 var rotation_dir = 0
 
+@export var lives: int = 0:
+	get:
+		return lives
+	set(value):
+		lives = max(value, 0)
+		set_lives(value)
+
+func set_lives(value):
+	emit_signal("lives_changed", value)
+
 func _ready():
 	screensize = get_viewport().get_visible_rect().size
 	$GunTimer.wait_time = fire_rate
+	change_state(INIT)
+	
+func start():
+	$Sprite2D.show()
+	self.lives = 3
 	change_state(ALIVE)
 	
 func change_state(new_state):
 	match new_state:
 		INIT:
 			$CollisionShape2D.call_deferred("set_disabled", true)
+			$Sprite2D.modulate.a = 0.5
 		ALIVE:
 			$CollisionShape2D.call_deferred("set_disabled", false)
+			$Sprite2D.modulate.a = 1
 		INVULNERABLE:
 			$CollisionShape2D.call_deferred("set_disabled", true)
+			$Sprite2D.modulate.a = 0.5
+			$InvulnerabilityTimer.start()
 		DEAD:
 			$CollisionShape2D.call_deferred("set_disabled", true)
+			$Sprite2D.hide()
+			linear_velocity = Vector2()
+			emit_signal("dead")
 	
 	state = new_state
 
@@ -111,3 +135,23 @@ func _integrate_forces(physics_state):
 
 func _on_gun_timer_timeout():
 	can_shoot = true
+
+
+func _on_invulnerability_timer_timeout():
+	change_state(ALIVE)
+
+
+func _on_animation_player_animation_finished(_anim_name):
+	$Explosion.hide()
+
+
+func _on_body_entered(body):
+	if body.is_in_group("rocks"):
+		body.explode()
+		$Explosion.show()
+		$Explosion/AnimationPlayer.play("explosion")
+		self.lives -= 1
+		if lives <= 0:
+			change_state(DEAD)
+		else:
+			change_state(INVULNERABLE)

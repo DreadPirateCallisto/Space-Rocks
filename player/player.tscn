@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://3x5iyc3i3nwj"]
+[gd_scene load_steps=7 format=3 uid="uid://3x5iyc3i3nwj"]
 
 [ext_resource type="Script" path="res://player/player.gd" id="1_b0fta"]
 [ext_resource type="Texture2D" uid="uid://q5a71p304udr" path="res://assets/player_ship.png" id="1_fcbt1"]
 [ext_resource type="PackedScene" uid="uid://cbg7v725fkukq" path="res://player/bullet.tscn" id="2_hbtvb"]
+[ext_resource type="PackedScene" uid="uid://2n0wgcuiqaa5" path="res://rocks/explosion.tscn" id="4_o81ux"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_jgivo"]
 
@@ -11,6 +12,8 @@ radius = 30.0167
 
 [node name="Player" type="RigidBody2D"]
 physics_material_override = SubResource("PhysicsMaterial_jgivo")
+max_contacts_reported = 1
+contact_monitor = true
 linear_damp = 1.0
 angular_damp = 5.0
 script = ExtResource("1_b0fta")
@@ -34,4 +37,15 @@ position = Vector2(34, 0)
 one_shot = true
 autostart = true
 
+[node name="Explosion" parent="." instance=ExtResource("4_o81ux")]
+
+[node name="InvulnerabilityTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="timeout" from="GunTimer" to="." method="_on_gun_timer_timeout"]
+[connection signal="animation_finished" from="Explosion/AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="timeout" from="InvulnerabilityTimer" to="." method="_on_invulnerability_timer_timeout"]
+
+[editable path="Explosion"]

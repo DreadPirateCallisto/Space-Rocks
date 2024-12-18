@@ -4,12 +4,20 @@ extends Node2D
 
 var screensize: Vector2 = Vector2()
 
+var level = 0
+var score = 0
+var playing = false
+
 func _ready():
 	randomize()
 	screensize = get_viewport().get_visible_rect().size
 	$Player.screensize = screensize
-	for i in range(3):
-		spawn_rock(3)
+	#for i in range(3):
+		#spawn_rock(3)
+
+func _process(_delta):
+	if playing and $Rocks.get_child_count() == 0:
+		new_level()
 
 """
 	when called with a size parameter, it picks a random position alogn the Rockpath
@@ -30,8 +38,8 @@ func spawn_rock(size, pos=null, vel=null):
 	var r = Rock.instantiate()
 	r.screensize = screensize
 	r.start(pos, vel, size)
-	#$Rocks.add_child(r)
-	call_deferred("add_child", r)
+	#call_deferred("add_child", r)
+	$Rocks.call_deferred("add_child", r)
 	r.exploded.connect(_on_Rock_exploded)
 
 func _on_player_shoot(bullet, pos, dir):
@@ -57,3 +65,25 @@ func _on_Rock_exploded(size, radius, pos, vel):
 		var newpos = pos + tangent * radius
 		var newvel = dir * vel.length() * 2.1
 		spawn_rock(size-1, newpos, newvel)
+
+func new_game():
+	for rock in $Rocks.get_children():
+		rock.queue_free()
+	level = 0
+	score = 0
+	$HUD.update_score(score)
+	$Player.start()
+	$HUD.show_message("Get Ready!")
+	await $HUD/MessageTimer.timeout
+	playing = true
+	new_level()
+
+func new_level():
+	level += 1
+	$HUD.show_message("Wave %s" % level)
+	for i in range(level):
+		spawn_rock(3)
+
+func game_over():
+	playing = false
+	$HUD.game_over()
